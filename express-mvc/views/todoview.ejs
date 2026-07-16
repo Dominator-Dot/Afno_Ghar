@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MVC Todo App</title>
+</head>
+
+<body>
+    <h1>My Todo List</h1>
+    
+    <form action="/add" method="POST">
+        <input type="text" name="task" placeholder="Enter new task" required>
+        <button type="submit">Add Task</button>
+    </form>
+
+    <ul>
+        <% todos.forEach(todo => { %>
+            <li><%= todo.task %></li>
+        <% }); %>
+    </ul>
+</body>
+</html>
