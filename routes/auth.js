@@ -1,10 +1,6 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
 const pool = require('../db');
-<<<<<<< HEAD
-
-=======
->>>>>>> 4d8c98789ee30d97ee53780e4b32bce4522d5445
 const router = express.Router();
 
 router.post('/signup', async (req, res) => {

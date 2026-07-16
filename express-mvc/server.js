@@ -3,10 +3,6 @@ const express = require('express');
 const todoController = require('./controllers/todoController');
 
 const app = express();
-<<<<<<< HEAD
-
-=======
->>>>>>> 4d8c98789ee30d97ee53780e4b32bce4522d5445
 const PORT = 5000;
 
 // Middleware to parse form data (URL-encoded bodies)

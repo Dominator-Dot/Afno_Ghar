@@ -4,21 +4,16 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-<<<<<<< HEAD
-    "test": "echo \"Error: no test specified\" && exit 1"
-=======
+    "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon index.js"
->>>>>>> 4d8c98789ee30d97ee53780e4b32bce4522d5445
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
-<<<<<<< HEAD
     "dotenv": "^17.4.2",
-    "express": "^5.2.1"
-=======
+    "express": "^5.2.1",
     "bcrypt": "^6.0.0",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
@@ -29,6 +24,5 @@
   },
   "devDependencies": {
     "nodemon": "^3.1.14"
->>>>>>> 4d8c98789ee30d97ee53780e4b32bce4522d5445
   }
 }

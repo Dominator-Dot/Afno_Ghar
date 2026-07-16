@@ -1,17 +1,3 @@
-<<<<<<< HEAD
-require('dotenv').config();
-const express = require('express');
-const app = express();
-
-app.use(express.json());
-
-app.get('/health', (req, res) => {
-  res.json({ status: 'ok', message: 'Afno Ghar API running' });
-});
-
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-=======
 require('dotenv').config();
 const express = require('express');
 const app = express();
@@ -34,5 +20,7 @@ app.listen(PORT, () => console.log(`Server running on port ${PORT}`));const pool
 app.get('/db-test', async (req, res) => {
   const result = await pool.query('SELECT NOW()');
   res.json(result);
+  const productRoutes = require('./routes/products');
+app.use('/api/products', productRoutes);
+
 });
->>>>>>> 4d8c98789ee30d97ee53780e4b32bce4522d5445
