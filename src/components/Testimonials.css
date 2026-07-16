@@ -1,0 +1,68 @@
+.testimonial-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.testimonial-card {
+  background-color: var(--color-bg-alt);
+  padding: 30px;
+  border-radius: var(--radius);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+/* The middle testimonial stands out with a solid teal background,
+   matching the "Ramesh Shrestha" card in the design mock-up. */
+.testimonial-card.highlighted {
+  background-color: var(--color-teal-800);
+  color: #fff;
+}
+
+.testimonial-card.highlighted .reviewer-name,
+.testimonial-card.highlighted .quote {
+  color: #fff;
+}
+
+.testimonial-card.highlighted .reviewer-location {
+  color: #b7cbc8;
+}
+
+.stars {
+  color: var(--color-accent);
+  margin-bottom: 16px;
+  letter-spacing: 2px;
+}
+
+.quote {
+  font-style: italic;
+  margin-bottom: 24px;
+  color: var(--color-text);
+}
+
+.reviewer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background-color: var(--color-teal-500);
+}
+
+.reviewer-name {
+  font-weight: 700;
+}
+
+.reviewer-location {
+  font-size: 0.8rem;
+  color: var(--color-text-light);
+}
+
+@media (max-width: 900px) {
+  .testimonial-grid {
+    grid-template-columns: 1fr;
+  }
+}

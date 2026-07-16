@@ -1,0 +1,45 @@
+.category-strip {
+  background-color: var(--color-teal-900);
+  overflow: hidden;
+  white-space: nowrap;
+  padding: 18px 0;
+}
+
+.category-strip-track {
+  display: inline-flex;
+  gap: 40px;
+  animation: scroll-left 25s linear infinite;
+}
+
+.category-item {
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.9rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  gap: 40px;
+}
+
+.dot {
+  color: var(--color-accent);
+}
+
+/* Moves the track from 0 to -50% (since content is duplicated,
+   -50% lines up perfectly with the start again = seamless loop) */
+@keyframes scroll-left {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* Respect users who prefer less motion on screen */
+@media (prefers-reduced-motion: reduce) {
+  .category-strip-track {
+    animation: none;
+  }
+}

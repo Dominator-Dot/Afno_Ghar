@@ -1,0 +1,34 @@
+.feature-band {
+  background-color: var(--color-teal-800);
+  padding: 50px 0;
+}
+
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  text-align: center;
+}
+
+.feature-icon {
+  font-size: 2rem;
+  display: block;
+  margin-bottom: 12px;
+}
+
+.feature-item h4 {
+  color: #fff;
+  font-size: 1.05rem;
+  margin-bottom: 6px;
+}
+
+.feature-item p {
+  color: #b7cbc8;
+  font-size: 0.85rem;
+}
+
+@media (max-width: 768px) {
+  .feature-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
