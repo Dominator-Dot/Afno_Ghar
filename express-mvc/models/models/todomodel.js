@@ -4,7 +4,10 @@ const todos = [
     { id: 2, task: "Build an Express app" }
 ];
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 4d8c98789ee30d97ee53780e4b32bce4522d5445
 // Functions to interact with the data
 const TodoModel = {
     getAll: () => {
