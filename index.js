@@ -1,6 +1,8 @@
 require('dotenv').config();
 const express = require('express');
 const app = express();
+const cors = require('cors');
+app.use(cors({ origin: 'http://localhost:5173' })); // match your React dev server port
 const authRoutes = require('./routes/auth');
 
 
@@ -17,5 +19,5 @@ app.listen(PORT, () => console.log(`Server running on port ${PORT}`));const pool
 
 app.get('/db-test', async (req, res) => {
   const result = await pool.query('SELECT NOW()');
-  res.json(result.rows[0]);
+  res.json(result);
 });
