@@ -63,6 +63,8 @@ function Navbar() {
     }
   }
 
+  const showSignInLink = !user && location.pathname !== "/signin";
+
   return (
     <header className="navbar">
       <div className="container navbar-inner">
@@ -128,7 +130,7 @@ function Navbar() {
               </NavLink>
             </>
           )}
-          {!user && (
+          {showSignInLink && (
             <NavLink to="/signin" className="nav-link">
               Sign In
             </NavLink>

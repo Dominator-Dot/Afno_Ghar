@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import "./SignIn.css";
 
@@ -19,6 +19,8 @@ function SignIn() {
 
   const { login, signup } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const returnPath = location.state?.from?.pathname || "/products";
 
   function updateField(field, value) {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -85,8 +87,8 @@ function SignIn() {
       });
     }
 
-    // Redirect to products page after successful authentication
-    setTimeout(() => navigate("/products"), result.demo ? 900 : 0);
+    // Redirect back to the page the user originally requested.
+    setTimeout(() => navigate(returnPath), result.demo ? 900 : 0);
   }
 
   function switchMode(newMode) {
