@@ -1,51 +1,76 @@
-require('dotenv').config();
-const path = require('path');
-const express = require('express');
-const cors = require('cors');
+require("dotenv").config();
+
+const express = require("express");
+const cors = require("cors");
+
+const {
+  testDatabaseConnection,
+} = require("./config/database");
+
+const productRoutes = require("./routes/productRoutes");
+
 const app = express();
+const PORT = Number(process.env.PORT) || 5000;
 
-const pageRoutes = require('./routes/pages');
-const authRoutes = require('./routes/auth');
-const productRoutes = require('./routes/products');
-const pool = require('./db');
+app.use(
+  cors({
+    origin: true,
+    credentials: true,
+  })
+);
 
-app.use(cors({ origin: 'http://localhost:5173' }));
-app.use(express.json());
+app.use(express.json({ limit: "1mb" }));
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, 'public')));
 
-app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'views'));
-
-app.use('/', pageRoutes);
-app.use('/api/auth', authRoutes);
-app.use('/api/products', productRoutes);
-
-app.get('/health', (req, res) => {
-  res.json({ status: 'ok', message: 'Afno Ghar API running' });
-});
-
-app.get('/db-test', async (req, res) => {
+app.get("/health", async (req, res, next) => {
   try {
-    const result = await pool.query('SELECT NOW()');
-    res.json({ dbTime: result.rows[0] });
+    return res.status(200).json({
+      success: true,
+      status: "ok",
+      message: "Afno Ghar API is running.",
+      database: process.env.DB_NAME,
+    });
   } catch (error) {
-    console.error('DB test failed:', error);
-    res.status(500).json({ error: 'Database connection failed', details: error.message });
+    return next(error);
   }
 });
+
+app.use("/api/products", productRoutes);
 
 app.use((req, res) => {
-  res.status(404).json({ error: 'Not Found' });
+  return res.status(404).json({
+    success: false,
+    message: `Route not found: ${req.method} ${req.originalUrl}`,
+  });
 });
 
-app.use((err, req, res, next) => {
-  console.error('Unhandled error:', err);
-  if (req.accepts('html')) {
-    return res.status(500).render('error', { message: 'Internal Server Error' });
+app.use((error, req, res, next) => {
+  console.error(error);
+
+  return res.status(500).json({
+    success: false,
+    message: "An internal server error occurred.",
+    error:
+      process.env.NODE_ENV === "development"
+        ? error.message
+        : undefined,
+  });
+});
+
+async function startServer() {
+  try {
+    await testDatabaseConnection();
+
+    app.listen(PORT, () => {
+      console.log(
+        `Afno Ghar server running at http://localhost:${PORT}`
+      );
+    });
+  } catch (error) {
+    console.error("Unable to start server.");
+    console.error(error.message);
+    process.exit(1);
   }
-  res.status(500).json({ error: 'Internal Server Error' });
-});
+}
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+startServer();
