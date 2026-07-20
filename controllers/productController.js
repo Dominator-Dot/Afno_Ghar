@@ -1,11 +1,9 @@
 const { pool } = require("../config/database");
 
-// ===============================
-// GET ALL PRODUCTS
-// ===============================
+// GET /api/products
 const getAllProducts = async (req, res) => {
   try {
-    const [products] = await pool.query(`
+    const result = await pool.query(`
       SELECT
         p.id,
         p.name,
@@ -17,108 +15,120 @@ const getAllProducts = async (req, res) => {
         p.is_customizable,
         p.is_rentable,
         p.image_url,
+        p.status,
         c.name AS category
-      FROM products p
-      JOIN categories c
-      ON p.category_id = c.id
+      FROM products AS p
+      INNER JOIN categories AS c
+        ON p.category_id = c.id
       ORDER BY p.id DESC
     `);
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
-      count: products.length,
-      products,
+      count: result.rows.length,
+      products: result.rows,
     });
-  } catch (err) {
-    console.error(err);
+  } catch (error) {
+    console.error("Failed to fetch products:", error);
 
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: "Failed to fetch products",
     });
   }
 };
 
-// ===============================
-// GET PRODUCT BY ID
-// ===============================
+// GET /api/products/:id
 const getProductById = async (req, res) => {
   try {
-    const id = req.params.id;
+    const id = Number(req.params.id);
 
-    const [product] = await pool.query(
+    if (!Number.isInteger(id) || id <= 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Product ID must be a positive integer",
+      });
+    }
+
+    const result = await pool.query(
       `
-      SELECT
-        p.*,
-        c.name AS category
-      FROM products p
-      JOIN categories c
-      ON p.category_id = c.id
-      WHERE p.id = ?
-    `,
+        SELECT
+          p.*,
+          c.name AS category
+        FROM products AS p
+        INNER JOIN categories AS c
+          ON p.category_id = c.id
+        WHERE p.id = $1
+      `,
       [id]
     );
 
-    if (product.length === 0) {
+    if (result.rows.length === 0) {
       return res.status(404).json({
         success: false,
         message: "Product not found",
       });
     }
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
-      product: product[0],
+      product: result.rows[0],
     });
-  } catch (err) {
-    console.error(err);
+  } catch (error) {
+    console.error("Failed to fetch product:", error);
 
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
-      message: "Server Error",
+      message: "Failed to fetch product",
     });
   }
 };
 
-// ===============================
-// CREATE PRODUCT
-// ===============================
+// POST /api/products
 const createProduct = async (req, res) => {
   try {
     const {
       category_id,
       name,
       slug,
-      description,
+      description = null,
       base_price,
-      stock_quantity,
-      product_type,
-      is_customizable,
-      is_rentable,
-      image_url,
+      stock_quantity = 0,
+      product_type = "ready_made",
+      is_customizable = false,
+      is_rentable = false,
+      image_url = null,
     } = req.body;
 
-    const [result] = await pool.query(
+    if (!category_id || !name || !slug || base_price === undefined) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "category_id, name, slug and base_price are required",
+      });
+    }
+
+    const result = await pool.query(
       `
-      INSERT INTO products
-      (
-        category_id,
-        name,
-        slug,
-        description,
-        base_price,
-        stock_quantity,
-        product_type,
-        is_customizable,
-        is_rentable,
-        image_url
-      )
-      VALUES (?,?,?,?,?,?,?,?,?,?)
-    `,
+        INSERT INTO products (
+          category_id,
+          name,
+          slug,
+          description,
+          base_price,
+          stock_quantity,
+          product_type,
+          is_customizable,
+          is_rentable,
+          image_url
+        )
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+        RETURNING *
+      `,
       [
         category_id,
-        name,
-        slug,
+        name.trim(),
+        slug.trim(),
         description,
         base_price,
         stock_quantity,
@@ -129,15 +139,36 @@ const createProduct = async (req, res) => {
       ]
     );
 
-    res.status(201).json({
+    return res.status(201).json({
       success: true,
       message: "Product created successfully",
-      productId: result.insertId,
+      product: result.rows[0],
     });
-  } catch (err) {
-    console.error(err);
+  } catch (error) {
+    console.error("Failed to create product:", error);
 
-    res.status(500).json({
+    if (error.code === "23505") {
+      return res.status(409).json({
+        success: false,
+        message: "A product with this slug already exists",
+      });
+    }
+
+    if (error.code === "23503") {
+      return res.status(400).json({
+        success: false,
+        message: "The selected category does not exist",
+      });
+    }
+
+    if (error.code === "23514" || error.code === "22P02") {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid product data",
+      });
+    }
+
+    return res.status(500).json({
       success: false,
       message: "Failed to create product",
     });

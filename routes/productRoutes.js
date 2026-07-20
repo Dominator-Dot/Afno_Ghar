@@ -1,16 +1,18 @@
 const express = require("express");
 
+const productController = require(
+  "../controllers/productController"
+);
+
 const router = express.Router();
 
-const productController = require("../controllers/productController");
-
-// Get all products
+// GET /api/products
 router.get("/", productController.getAllProducts);
 
-// Get one product
+// GET /api/products/:id
 router.get("/:id", productController.getProductById);
 
-// Add new product
+// POST /api/products
 router.post("/", productController.createProduct);
 
 module.exports = router;

@@ -1,4 +1,4 @@
-const mysql = require("mysql2/promise");
+const { Pool } = require("pg");
 
 const requiredEnvironmentVariables = [
   "DB_HOST",
@@ -14,29 +14,30 @@ for (const variable of requiredEnvironmentVariables) {
   }
 }
 
-const pool = mysql.createPool({
+const pool = new Pool({
   host: process.env.DB_HOST,
-  port: Number(process.env.DB_PORT) || 3306,
+  port: Number(process.env.DB_PORT) || 5432,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD || "",
   database: process.env.DB_NAME,
 
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0,
+  max: 10,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 5000,
+});
 
-  decimalNumbers: true,
-  charset: "utf8mb4",
+pool.on("error", (error) => {
+  console.error("Unexpected PostgreSQL pool error:", error);
 });
 
 async function testDatabaseConnection() {
-  const connection = await pool.getConnection();
+  const client = await pool.connect();
 
   try {
-    await connection.query("SELECT 1");
-    console.log("MySQL database connected successfully.");
+    await client.query("SELECT 1");
+    console.log("PostgreSQL database connected successfully.");
   } finally {
-    connection.release();
+    client.release();
   }
 }
 
