@@ -7,6 +7,7 @@ const app = express();
 const pageRoutes = require('./routes/pages');
 const authRoutes = require('./routes/auth');
 const productRoutes = require('./routes/products');
+const rentalRoutes = require('./routes/rentals');
 const pool = require('./db');
 
 app.use(cors({ origin: 'http://localhost:5173' }));
@@ -20,6 +21,7 @@ app.set('views', path.join(__dirname, 'views'));
 app.use('/', pageRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
+app.use('/api/rentals', rentalRoutes);
 
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', message: 'Afno Ghar API running' });

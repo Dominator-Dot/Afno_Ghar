@@ -62,7 +62,10 @@ async function me(req, res) {
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
-    res.json(user);
+    // Wrapped in { user } to match the shape the frontend's
+    // src/api/authApi.js / AuthContext expect (same shape as
+    // login/signup: { user, token }, minus the token).
+    res.json({ user });
   } catch (error) {
     console.error('Get current user error:', error);
     res.status(500).json({ error: 'Failed to fetch user profile' });

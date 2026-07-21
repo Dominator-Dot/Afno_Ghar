@@ -24,7 +24,7 @@ async function getProduct(req, res) {
 }
 
 async function createProduct(req, res) {
-  const { name, description, price, category, stock, image_url } = req.body;
+  const { name, description, details, price, category, material, tag, stock, image_url, images } = req.body;
   if (!name || price === undefined) {
     return res.status(400).json({ error: 'Product name and price are required' });
   }
@@ -33,10 +33,14 @@ async function createProduct(req, res) {
     const product = await ProductModel.createProduct({
       name,
       description,
+      details,
       price,
       category,
+      material,
+      tag,
       stock: stock || 0,
       image_url,
+      images,
     });
     res.status(201).json(product);
   } catch (error) {
@@ -46,16 +50,20 @@ async function createProduct(req, res) {
 }
 
 async function updateProduct(req, res) {
-  const { name, description, price, category, stock, image_url } = req.body;
+  const { name, description, details, price, category, material, tag, stock, image_url, images } = req.body;
 
   try {
     const updated = await ProductModel.updateProduct(req.params.id, {
       name,
       description,
+      details,
       price,
       category,
+      material,
+      tag,
       stock,
       image_url,
+      images,
     });
     if (!updated) {
       return res.status(404).json({ error: 'Product not found' });
