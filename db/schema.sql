@@ -16,3 +16,17 @@ CREATE TABLE IF NOT EXISTS products (
   image_url TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+--rentals, 
+CREATE TABLE IF NOT EXISTS rentals (
+  id SERIAL PRIMARY KEY,
+  product_id INTEGER REFERENCES products(id) ON DELETE SET NULL,
+  product_name TEXT NOT NULL,
+  user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+  user_name TEXT NOT NULL,
+  user_phone TEXT NOT NULL,
+  citizen_number TEXT NOT NULL,
+  address TEXT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'pending',
+  requested_at TIMESTAMPTZ DEFAULT NOW()
+);

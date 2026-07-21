@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 const UserModel = require('../models/userModel');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'please_set_a_strong_secret';
-const TOKEN_EXPIRATION = '1h';
+const TOKEN_EXPIRATION = '24h';
 
 async function signup(req, res) {
   const { name, email, password } = req.body;
@@ -62,7 +62,10 @@ async function me(req, res) {
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
-    res.json(user);
+    // Wrapped in { user } to match the shape the frontend's
+    // src/api/authApi.js / AuthContext expect (same shape as
+    // login/signup: { user, token }, minus the token).
+    res.json({ user });
   } catch (error) {
     console.error('Get current user error:', error);
     res.status(500).json({ error: 'Failed to fetch user profile' });

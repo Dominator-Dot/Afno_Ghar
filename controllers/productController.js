@@ -77,10 +77,10 @@ const getProductById = async (req, res) => {
   } catch (error) {
     console.error("Failed to fetch product:", error);
 
-    return res.status(500).json({
-      success: false,
-      message: "Failed to fetch product",
-    });
+async function createProduct(req, res) {
+  const { name, description, details, price, category, material, tag, stock, image_url, images } = req.body;
+  if (!name || price === undefined) {
+    return res.status(400).json({ error: 'Product name and price are required' });
   }
 };
 
@@ -90,75 +90,37 @@ const createProduct = async (req, res) => {
     const {
       category_id,
       name,
-      slug,
-      description = null,
-      base_price,
-      stock_quantity = 0,
-      product_type = "ready_made",
-      is_customizable = false,
-      is_rentable = false,
-      image_url = null,
-    } = req.body;
-
-    if (!category_id || !name || !slug || base_price === undefined) {
-      return res.status(400).json({
-        success: false,
-        message:
-          "category_id, name, slug and base_price are required",
-      });
-    }
-
-    const result = await pool.query(
-      `
-        INSERT INTO products (
-          category_id,
-          name,
-          slug,
-          description,
-          base_price,
-          stock_quantity,
-          product_type,
-          is_customizable,
-          is_rentable,
-          image_url
-        )
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
-        RETURNING *
-      `,
-      [
-        category_id,
-        name.trim(),
-        slug.trim(),
-        description,
-        base_price,
-        stock_quantity,
-        product_type,
-        is_customizable,
-        is_rentable,
-        image_url,
-      ]
-    );
-
-    return res.status(201).json({
-      success: true,
-      message: "Product created successfully",
-      product: result.rows[0],
+      description,
+      details,
+      price,
+      category,
+      material,
+      tag,
+      stock: stock || 0,
+      image_url,
+      images,
     });
   } catch (error) {
     console.error("Failed to create product:", error);
 
-    if (error.code === "23505") {
-      return res.status(409).json({
-        success: false,
-        message: "A product with this slug already exists",
-      });
-    }
+async function updateProduct(req, res) {
+  const { name, description, details, price, category, material, tag, stock, image_url, images } = req.body;
 
-    if (error.code === "23503") {
-      return res.status(400).json({
-        success: false,
-        message: "The selected category does not exist",
-      });
+  try {
+    const updated = await ProductModel.updateProduct(req.params.id, {
+      name,
+      description,
+      details,
+      price,
+      category,
+      material,
+      tag,
+      stock,
+      image_url,
+      images,
+    });
+    if (!updated) {
+      return res.status(404).json({ error: 'Product not found' });
     }
 
     if (error.code === "23514" || error.code === "22P02") {

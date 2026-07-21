@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "test": "echo \"No tests added yet\""
+    "init-db": "node scripts/initDb.js",
+    "seed-products": "node scripts/seedProducts.js"
   },
   "keywords": [],
   "author": "",
