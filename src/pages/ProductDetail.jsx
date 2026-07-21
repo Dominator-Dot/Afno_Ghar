@@ -7,6 +7,7 @@ import {
 } from "../data/products";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
+import { rentFurniture } from "../api/rentalsApi";
 import ProductCard from "../components/ProductCard";
 import "./ProductDetail.css";
 
@@ -55,6 +56,14 @@ function ProductDetail() {
   const [reviewRating, setReviewRating] = useState(5);
   const [reviewComment, setReviewComment] = useState("");
   const [submittingReview, setSubmittingReview] = useState(false);
+  const [showRentalForm, setShowRentalForm] = useState(false);
+  const [rentalName, setRentalName] = useState(user?.name || "");
+  const [rentalPhone, setRentalPhone] = useState("");
+  const [rentalCitizen, setRentalCitizen] = useState("");
+  const [rentalAddress, setRentalAddress] = useState("");
+  const [submittingRental, setSubmittingRental] = useState(false);
+  const [rentalConfirmed, setRentalConfirmed] = useState(false);
+  const [rentalError, setRentalError] = useState(null);
   const { addToCart } = useCart();
 
   if (!product) {
@@ -114,6 +123,40 @@ function ProductDetail() {
       setShowReviewForm(false);
       setSubmittingReview(false);
     }, 500);
+  }
+
+  async function handleSubmitRental(e) {
+    e.preventDefault();
+    if (
+      !rentalName.trim() ||
+      !rentalPhone.trim() ||
+      !rentalCitizen.trim() ||
+      !rentalAddress.trim()
+    ) {
+      return;
+    }
+
+    setSubmittingRental(true);
+    setRentalError(null);
+
+    try {
+      await rentFurniture({
+        productId: product.id,
+        productName: product.name,
+        userName: rentalName,
+        userPhone: rentalPhone,
+        citizenNumber: rentalCitizen,
+        address: rentalAddress,
+        userEmail: user.email,
+      });
+
+      setRentalConfirmed(true);
+      setShowRentalForm(false);
+    } catch (error) {
+      setRentalError(error.message || "Unable to submit rental request.");
+    } finally {
+      setSubmittingRental(false);
+    }
   }
 
   return (
@@ -184,6 +227,17 @@ function ProductDetail() {
               >
                 {product.stock === 0 ? "Out of Stock" : "🛍 Add to Cart"}
               </button>
+              <button
+                type="button"
+                className="btn btn-secondary detail-rental-btn"
+                onClick={() => {
+                  setShowRentalForm(!showRentalForm);
+                  setRentalConfirmed(false);
+                }}
+                disabled={product.stock === 0}
+              >
+                {showRentalForm ? "Cancel Rental" : "Rent This Item"}
+              </button>
             </div>
 
             {justAdded && (
@@ -191,6 +245,82 @@ function ProductDetail() {
                 Added {quantity} × {product.name} to your cart.{" "}
                 <Link to="/cart">View Cart</Link>
               </p>
+            )}
+
+            {rentalConfirmed && (
+              <p className="rental-confirmation">
+                Your rental request for <strong>{product.name}</strong> has been sent.
+                We will contact you at <strong>{rentalPhone}</strong> soon.
+              </p>
+            )}
+
+            {showRentalForm && (
+              <form className="rental-form" onSubmit={handleSubmitRental}>
+                <h3>Rental Request</h3>
+                <p>
+                  Complete the details below so we can verify your identity and
+                  confirm delivery.
+                </p>
+                {rentalError && (
+                  <p className="form-error">{rentalError}</p>
+                )}
+
+                <div className="form-group">
+                  <label htmlFor="rental-name">Full Name</label>
+                  <input
+                    id="rental-name"
+                    type="text"
+                    value={rentalName}
+                    onChange={(e) => setRentalName(e.target.value)}
+                    placeholder="Your full name"
+                    disabled={submittingRental}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="rental-phone">Phone Number</label>
+                  <input
+                    id="rental-phone"
+                    type="tel"
+                    value={rentalPhone}
+                    onChange={(e) => setRentalPhone(e.target.value)}
+                    placeholder="98XXXXXXXX"
+                    disabled={submittingRental}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="rental-citizen">Citizen Number / Identity Proof</label>
+                  <input
+                    id="rental-citizen"
+                    type="text"
+                    value={rentalCitizen}
+                    onChange={(e) => setRentalCitizen(e.target.value)}
+                    placeholder="Enter citizen number or ID proof"
+                    disabled={submittingRental}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="rental-address">Delivery / Usage Address</label>
+                  <textarea
+                    id="rental-address"
+                    value={rentalAddress}
+                    onChange={(e) => setRentalAddress(e.target.value)}
+                    placeholder="Where will the furniture be placed?"
+                    rows="4"
+                    disabled={submittingRental}
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  className="btn btn-primary"
+                  disabled={submittingRental}
+                >
+                  {submittingRental ? "Requesting..." : "Submit Rental Request"}
+                </button>
+              </form>
             )}
           </div>
         </div>

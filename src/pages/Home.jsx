@@ -4,6 +4,7 @@ import FeatureHighlights from "../components/FeatureHighlights";
 import CollectionsGrid from "../components/CollectionsGrid";
 import ProductFilterGrid from "../components/ProductFilterGrid";
 import Testimonials from "../components/Testimonials";
+import RentalInfo from "../components/RentalInfo";
 import products from "../data/products";
 
 /*
@@ -27,6 +28,8 @@ function Home() {
       <section id="features">
         <FeatureHighlights />
       </section>
+
+      <RentalInfo />
 
       <section id="collections">
         <CollectionsGrid />

@@ -110,6 +110,16 @@ button {
   background-color: var(--color-teal-600);
 }
 
+.btn-secondary {
+  background-color: #ffffff;
+  color: var(--color-teal-900);
+  border: 1px solid var(--color-teal-700);
+}
+
+.btn-secondary:hover {
+  background-color: var(--color-teal-100);
+}
+
 .btn-outline {
   background-color: transparent;
   color: #fff;
