@@ -1,36 +1,94 @@
-const ProductModel = require('../models/productModel');
+const { pool } = require("../config/database");
 
-async function listProducts(req, res) {
+// GET /api/products
+const getAllProducts = async (req, res) => {
   try {
-    const products = await ProductModel.findAll();
-    res.json(products);
+    const result = await pool.query(`
+      SELECT
+        p.id,
+        p.name,
+        p.slug,
+        p.description,
+        p.base_price,
+        p.stock_quantity,
+        p.product_type,
+        p.is_customizable,
+        p.is_rentable,
+        p.image_url,
+        p.status,
+        c.name AS category
+      FROM products AS p
+      INNER JOIN categories AS c
+        ON p.category_id = c.id
+      ORDER BY p.id DESC
+    `);
+
+    return res.status(200).json({
+      success: true,
+      count: result.rows.length,
+      products: result.rows,
+    });
   } catch (error) {
-    console.error('List products error:', error);
-    res.status(500).json({ error: 'Failed to fetch products' });
-  }
-}
+    console.error("Failed to fetch products:", error);
 
-async function getProduct(req, res) {
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch products",
+    });
+  }
+};
+
+// GET /api/products/:id
+const getProductById = async (req, res) => {
   try {
-    const product = await ProductModel.findById(req.params.id);
-    if (!product) {
-      return res.status(404).json({ error: 'Product not found' });
+    const id = Number(req.params.id);
+
+    if (!Number.isInteger(id) || id <= 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Product ID must be a positive integer",
+      });
     }
-    res.json(product);
+
+    const result = await pool.query(
+      `
+        SELECT
+          p.*,
+          c.name AS category
+        FROM products AS p
+        INNER JOIN categories AS c
+          ON p.category_id = c.id
+        WHERE p.id = $1
+      `,
+      [id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Product not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      product: result.rows[0],
+    });
   } catch (error) {
-    console.error('Get product error:', error);
-    res.status(500).json({ error: 'Failed to fetch product' });
-  }
-}
+    console.error("Failed to fetch product:", error);
 
 async function createProduct(req, res) {
   const { name, description, details, price, category, material, tag, stock, image_url, images } = req.body;
   if (!name || price === undefined) {
     return res.status(400).json({ error: 'Product name and price are required' });
   }
+};
 
+// POST /api/products
+const createProduct = async (req, res) => {
   try {
-    const product = await ProductModel.createProduct({
+    const {
+      category_id,
       name,
       description,
       details,
@@ -42,12 +100,8 @@ async function createProduct(req, res) {
       image_url,
       images,
     });
-    res.status(201).json(product);
   } catch (error) {
-    console.error('Create product error:', error);
-    res.status(500).json({ error: 'Failed to create product' });
-  }
-}
+    console.error("Failed to create product:", error);
 
 async function updateProduct(req, res) {
   const { name, description, details, price, category, material, tag, stock, image_url, images } = req.body;
@@ -68,30 +122,23 @@ async function updateProduct(req, res) {
     if (!updated) {
       return res.status(404).json({ error: 'Product not found' });
     }
-    res.json(updated);
-  } catch (error) {
-    console.error('Update product error:', error);
-    res.status(500).json({ error: 'Failed to update product' });
-  }
-}
 
-async function deleteProduct(req, res) {
-  try {
-    const deleted = await ProductModel.deleteProduct(req.params.id);
-    if (!deleted) {
-      return res.status(404).json({ error: 'Product not found' });
+    if (error.code === "23514" || error.code === "22P02") {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid product data",
+      });
     }
-    res.json({ message: 'Product deleted', id: deleted.id });
-  } catch (error) {
-    console.error('Delete product error:', error);
-    res.status(500).json({ error: 'Failed to delete product' });
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to create product",
+    });
   }
-}
+};
 
 module.exports = {
-  listProducts,
-  getProduct,
+  getAllProducts,
+  getProductById,
   createProduct,
-  updateProduct,
-  deleteProduct,
 };
