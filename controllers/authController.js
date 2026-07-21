@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 const UserModel = require('../models/userModel');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'please_set_a_strong_secret';
-const TOKEN_EXPIRATION = '1h';
+const TOKEN_EXPIRATION = '24h';
 
 async function signup(req, res) {
   const { name, email, password } = req.body;
