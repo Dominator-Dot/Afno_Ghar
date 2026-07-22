@@ -1,0 +1,163 @@
+/* ============================================
+   GLOBAL STYLES + THEME VARIABLES
+   ============================================
+   This file holds the "design tokens" (colors,
+   fonts, spacing) that the whole site shares.
+   If you want to change the theme color later,
+   you only need to edit the values below —
+   every component reads its colors from here.
+   ============================================ */
+
+:root {
+  /* ---- Brand colors (teal theme) ---- */
+  --color-teal-900: #0b3d3a;   /* darkest teal - navbar text, headings */
+  --color-teal-800: #0f4c46;   /* dark teal - hero overlay, footer bg */
+  --color-teal-700: #106b63;   /* main brand teal - buttons, links */
+  --color-teal-600: #158a7d;   /* hover state for buttons */
+  --color-teal-500: #1fae9e;   /* lighter teal - badges, icons */
+  --color-teal-100: #d9f2ef;   /* very light teal - soft backgrounds */
+
+  /* ---- Accent color (used sparingly for CTAs / highlights) ---- */
+  --color-accent: #c9a227;      /* warm gold, pairs well with teal */
+  --color-accent-dark: #a9860f;
+
+  /* ---- Neutral colors ---- */
+  --color-bg: #f7f5f0;          /* warm off-white page background */
+  --color-bg-alt: #ffffff;      /* card / section background */
+  --color-text: #22302f;        /* main body text */
+  --color-text-light: #5c6b69;  /* secondary / muted text */
+  --color-border: #e1ded4;      /* soft border color */
+
+  /* ---- Fonts ---- */
+  --font-heading: "Playfair Display", Georgia, serif;
+  --font-body: "Poppins", Arial, sans-serif;
+
+  /* ---- Spacing helpers ---- */
+  --container-width: 1200px;
+  --radius: 10px;
+}
+
+/* Reset some default browser styles so every browser looks the same */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  line-height: 1.6;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-heading);
+  color: var(--color-teal-900);
+  line-height: 1.2;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+ul {
+  list-style: none;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+button {
+  font-family: var(--font-body);
+  cursor: pointer;
+  border: none;
+}
+
+/* A reusable "container" class to center content and
+   keep a max width, used across almost every section. */
+.container {
+  max-width: var(--container-width);
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* Reusable button styles used across the site */
+.btn {
+  display: inline-block;
+  padding: 14px 28px;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  letter-spacing: 0.5px;
+  transition: all 0.2s ease-in-out;
+  text-align: center;
+}
+
+.btn-primary {
+  background-color: var(--color-teal-700);
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background-color: var(--color-teal-600);
+}
+
+.btn-secondary {
+  background-color: #ffffff;
+  color: var(--color-teal-900);
+  border: 1px solid var(--color-teal-700);
+}
+
+.btn-secondary:hover {
+  background-color: var(--color-teal-100);
+}
+
+.btn-tertiary {
+  background-color: transparent;
+  color: var(--color-teal-900);
+  border: 1px solid rgba(34, 58, 63, 0.16);
+}
+
+.btn-tertiary:hover {
+  background-color: rgba(34, 58, 63, 0.05);
+}
+
+.btn-outline {
+  background-color: transparent;
+  color: #fff;
+  border: 1px solid #fff;
+}
+
+.btn-outline:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+/* Generic section spacing so pages feel consistent */
+.section {
+  padding: 80px 0;
+}
+
+.section-eyebrow {
+  color: var(--color-accent);
+  font-weight: 600;
+  letter-spacing: 2px;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.section-title {
+  font-size: 2.5rem;
+  text-align: center;
+  margin-bottom: 50px;
+}
