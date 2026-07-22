@@ -10,7 +10,7 @@ const productRoutes = require('./routes/products');
 const rentalRoutes = require('./routes/rentals');
 const pool = require('./db');
 
-app.use(cors({ origin: 'http://localhost:5173' }));
+app.use(cors({ origin: 'http://localhost:5174' }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
