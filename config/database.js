@@ -1,16 +1,10 @@
 const { Pool } = require("pg");
 
-const requiredEnvironmentVariables = [
-  "DB_HOST",
-  "DB_USER",
-  "DB_NAME",
-];
+const requiredEnvironmentVariables = ["DB_HOST", "DB_USER", "DB_NAME"];
 
 for (const variable of requiredEnvironmentVariables) {
   if (!process.env[variable]) {
-    throw new Error(
-      `Missing required environment variable: ${variable}`
-    );
+    throw new Error(`Missing required environment variable: ${variable}`);
   }
 }
 
@@ -20,7 +14,6 @@ const pool = new Pool({
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD || "",
   database: process.env.DB_NAME,
-
   max: 10,
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 5000,
@@ -32,7 +25,6 @@ pool.on("error", (error) => {
 
 async function testDatabaseConnection() {
   const client = await pool.connect();
-
   try {
     await client.query("SELECT 1");
     console.log("PostgreSQL database connected successfully.");
@@ -41,7 +33,4 @@ async function testDatabaseConnection() {
   }
 }
 
-module.exports = {
-  pool,
-  testDatabaseConnection,
-};
+module.exports = { pool, testDatabaseConnection };

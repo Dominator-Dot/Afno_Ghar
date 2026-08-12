@@ -1,54 +1,22 @@
-# Afno_Ghar Backend
+# Afno Ghar backend patch
 
-This repository contains the Afno Ghar backend API built with Express, PostgreSQL, and MVC-style controllers and views.
+Copy these files into the matching folders in your project.
 
-## Features
-- User signup and login with JWT authentication
-- Product listing and CRUD endpoints
-- EJS views for a simple browser-accessible home page and authentication pages
-- Database schema and initialization script for PostgreSQL
+1. Run your original `database/schema.sql` first if the tables do not exist.
+2. Run `database/feature_patch.sql` once.
+3. Copy `.env.example` values into your `.env` and fill real sandbox keys.
+4. Make sure package.json uses `node server.js` and `nodemon server.js`.
+5. Start with `npm run dev`.
 
-## Setup
-1. Install dependencies:
-   ```powershell
-   npm install
-   ```
-2. Create a `.env` file in the repository root with the database and JWT settings:
-   ```env
-   PORT=5000
-   DB_USER=postgres
-   DB_PASSWORD=your_password
-   DB_HOST=localhost
-   DB_PORT=5432
-   DB_NAME=Afno_Ghar
-   JWT_SECRET=your_super_secret_value
-   ```
-3. Initialize the database schema:
-   ```powershell
-   npm run init-db
-   ```
-4. Start the server:
-   ```powershell
-   npm start
-   ```
-
-## Running in development
-```powershell
-npm run dev
-```
-
-## API Endpoints
-- `GET /` - Home page with API information and product list
-- `GET /health` - Health check endpoint
-- `POST /api/auth/signup` - Register a new user
-- `POST /api/auth/login` - Authenticate and receive a JWT token
-- `GET /api/auth/me` - Get the logged-in user's profile
-- `GET /api/products` - List products
-- `GET /api/products/:id` - Get a single product by ID
-- `POST /api/products` - Create a product (requires `Authorization: Bearer <token>`)
-- `PUT /api/products/:id` - Update a product (requires auth)
-- `DELETE /api/products/:id` - Delete a product (requires auth)
-
-## Notes
-- The home page is rendered using EJS and can be used to view products and interact with the backend.
-- Use the `scripts/initDb.js` helper to create `users` and `products` tables automatically.
+Main APIs:
+- POST /api/auth/signup
+- POST /api/auth/login
+- GET /api/customization/products/:id/options
+- POST /api/orders
+- GET /api/orders/my
+- GET /api/tracking/orders/:orderNumber
+- PATCH /api/tracking/:trackingId
+- POST /api/payments/khalti/initiate
+- GET /api/payments/khalti/callback
+- POST /api/payments/esewa/initiate
+- GET /api/payments/esewa/success

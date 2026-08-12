@@ -1,86 +1,104 @@
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-const UserModel = require('../models/userModel');
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const UserModel = require("../models/userModel");
 
-const JWT_SECRET = process.env.JWT_SECRET || 'please_set_a_strong_secret';
-const TOKEN_EXPIRATION = '1h';
+const TOKEN_EXPIRATION = "1h";
+
+function signToken(user) {
+  if (!process.env.JWT_SECRET) throw new Error("JWT_SECRET is required");
+  return jwt.sign(
+    { userId: user.id, role: user.role },
+    process.env.JWT_SECRET,
+    { expiresIn: TOKEN_EXPIRATION }
+  );
+}
 
 async function signup(req, res) {
-  const { name, email, password } = req.body;
-  if (!name || !email || !password) {
-    return res.status(400).json({ error: 'Missing name, email, or password' });
-  }
-
   try {
-    const existingUser = await UserModel.findByEmail(email);
+    const { full_name, name, email, phone, password } = req.body;
+    const fullName = String(full_name || name || "").trim();
+    const normalizedEmail = String(email || "").trim().toLowerCase();
+    const normalizedPhone = String(phone || "").trim();
+
+    if (!fullName || !normalizedEmail || !normalizedPhone || !password) {
+      return res.status(400).json({
+        success: false,
+        message: "full_name, email, phone and password are required",
+      });
+    }
+
+    if (String(password).length < 8) {
+      return res.status(400).json({ success: false, message: "Password must be at least 8 characters" });
+    }
+
+    const existingUser = await UserModel.findByEmail(normalizedEmail);
     if (existingUser) {
-      return res.status(409).json({ error: 'Email already registered' });
+      return res.status(409).json({ success: false, message: "Email already registered" });
     }
 
-    const passwordHash = await bcrypt.hash(password, 10);
-    const newUser = await UserModel.createUser({ name, email, passwordHash });
-    const token = jwt.sign({ userId: newUser.id }, JWT_SECRET, { expiresIn: TOKEN_EXPIRATION });
-res.status(201).json({ token, user: newUser });
+    const passwordHash = await bcrypt.hash(String(password), 10);
+    const newUser = await UserModel.createUser({
+      fullName,
+      email: normalizedEmail,
+      phone: normalizedPhone,
+      passwordHash,
+    });
 
+    return res.status(201).json({
+      success: true,
+      token: signToken(newUser),
+      user: newUser,
+    });
   } catch (error) {
-    console.error('Signup error:', error);
-    if (error.code === '23505') {
-      return res.status(409).json({ error: 'Email already registered' });
+    if (error.code === "23505") {
+      return res.status(409).json({ success: false, message: "Email or phone is already registered" });
     }
-    res.status(500).json({ error: 'Failed to create user' });
+    return nextOr500(error, res, "Failed to create user");
   }
 }
 
 async function login(req, res) {
-  const { email, password } = req.body;
-  if (!email || !password) {
-    return res.status(400).json({ error: 'Missing email or password' });
-  }
-
   try {
+    const email = String(req.body.email || "").trim().toLowerCase();
+    const password = String(req.body.password || "");
+
+    if (!email || !password) {
+      return res.status(400).json({ success: false, message: "Email and password are required" });
+    }
+
     const user = await UserModel.findByEmail(email);
-    if (!user) {
-      return res.status(401).json({ error: 'Invalid credentials' });
+    if (!user || user.status !== "active") {
+      return res.status(401).json({ success: false, message: "Invalid credentials" });
     }
 
-    const passwordMatches = await bcrypt.compare(password, user.password_hash);
-    if (!passwordMatches) {
-      return res.status(401).json({ error: 'Invalid credentials' });
+    const matches = await bcrypt.compare(password, user.password_hash);
+    if (!matches) {
+      return res.status(401).json({ success: false, message: "Invalid credentials" });
     }
 
-    const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: TOKEN_EXPIRATION });
-    res.json({ token, user: { id: user.id, name: user.name, email: user.email } });
+    return res.json({
+      success: true,
+      token: signToken(user),
+      user: {
+        id: user.id,
+        full_name: user.full_name,
+        email: user.email,
+        phone: user.phone,
+        role: user.role,
+      },
+    });
   } catch (error) {
-    console.error('Login error:', error);
-    res.status(500).json({ error: 'Failed to log in' });
+    return nextOr500(error, res, "Failed to log in");
   }
 }
 
 async function me(req, res) {
-  try {
-    const user = await UserModel.findById(req.userId);
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-    res.json(user);
-  } catch (error) {
-    console.error('Get current user error:', error);
-    res.status(500).json({ error: 'Failed to fetch user profile' });
-  }
+  return res.json({ success: true, user: req.user });
 }
 
-function showSignup(req, res) {
-  res.render('signup');
+function nextOr500(error, res, message) {
+  console.error(error);
+  return res.status(500).json({ success: false, message });
 }
 
-function showLogin(req, res) {
-  res.render('login');
-}
-
-module.exports = {
-  signup,
-  login,
-  me,
-  showSignup,
-  showLogin,
-};
+module.exports = { signup, login, me };

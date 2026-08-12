@@ -1,18 +1,12 @@
 const express = require("express");
-
-const productController = require(
-  "../controllers/productController"
-);
+const productController = require("../controllers/productController");
+const authenticateToken = require("../middleware/authMiddleware");
+const requireRoles = require("../middleware/roleMiddleware");
 
 const router = express.Router();
 
-// GET /api/products
 router.get("/", productController.getAllProducts);
-
-// GET /api/products/:id
 router.get("/:id", productController.getProductById);
-
-// POST /api/products
-router.post("/", productController.createProduct);
+router.post("/", authenticateToken, requireRoles("admin"), productController.createProduct);
 
 module.exports = router;

@@ -1,19 +1,26 @@
-const API_URL = 'http://localhost:5000/api';
+const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
-export async function signup(name, email, password) {
-  const res = await fetch(`${API_URL}/auth/signup`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ name, email, password }),
+export async function api(path, options = {}) {
+  const token = localStorage.getItem("token");
+  const response = await fetch(`${API_BASE}${path}`, {
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...(options.headers || {}),
+    },
   });
-  return res.json();
+
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(data.message || "Request failed");
+  return data;
 }
 
-export async function login(email, password) {
-  const res = await fetch(`${API_URL}/auth/login`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password }),
-  });
-  return res.json();
-}
+export const getCustomizationOptions = (productId) => api(`/customization/products/${productId}/options`);
+export const createOrder = (payload) => api("/orders", { method: "POST", body: JSON.stringify(payload) });
+export const getMyOrders = () => api("/orders/my");
+export const getTracking = (orderNumber) => api(`/tracking/orders/${orderNumber}`);
+export const initiateKhalti = (orderId, paymentType = "advance") =>
+  api("/payments/khalti/initiate", { method: "POST", body: JSON.stringify({ order_id: orderId, payment_type: paymentType }) });
+export const initiateEsewa = (orderId, paymentType = "advance") =>
+  api("/payments/esewa/initiate", { method: "POST", body: JSON.stringify({ order_id: orderId, payment_type: paymentType }) });
