@@ -1,8 +1,8 @@
 import "./About.css";
 
-function About() {
+function About({ id }) {
   return (
-    <section className="section about-page">
+    <section id={id} className="section about-page">
       <div className="container about-grid">
         <div className="about-image-wrap">
           <img

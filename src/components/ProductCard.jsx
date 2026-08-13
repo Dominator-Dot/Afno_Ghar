@@ -33,6 +33,12 @@ function ProductCard({ product }) {
       <Link to={`/products/${product.id}`} className="product-image-wrap">
         {product.tag && <span className="product-tag">{product.tag}</span>}
         <img src={product.image} alt={product.name} />
+
+        <div className="product-hover-info">
+          <span>{product.images.length} views</span>
+          <p>{product.description}</p>
+        </div>
+
         <button
           className={`wishlist-btn ${inWishlist ? "active" : ""}`}
           onClick={(e) => {

@@ -1,11 +1,15 @@
-import { Link } from "react-router-dom";
 import "./Hero.css";
 
 function Hero() {
+  const scrollToSection = (sectionId) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
   return (
     <section className="hero">
-      {/* This dark overlay sits on top of the background image
-          so the white text stays readable (see Hero.css). */}
       <div className="hero-overlay">
         <div className="container hero-content">
           <p className="hero-eyebrow">EST. 2005 · KATHMANDU, NEPAL</p>
@@ -21,12 +25,20 @@ function Hero() {
           </p>
 
           <div className="hero-buttons">
-            <Link to="/products" className="btn btn-primary">
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={() => scrollToSection("featured-products")}
+            >
               Shop Now
-            </Link>
-            <Link to="/about" className="btn btn-outline">
+            </button>
+            <button
+              type="button"
+              className="btn btn-outline"
+              onClick={() => scrollToSection("our-story")}
+            >
               Our Story
-            </Link>
+            </button>
           </div>
         </div>
 

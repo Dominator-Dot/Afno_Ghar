@@ -5,6 +5,7 @@ import CollectionsGrid from "../components/CollectionsGrid";
 import ProductFilterGrid from "../components/ProductFilterGrid";
 import Testimonials from "../components/Testimonials";
 import RentalInfo from "../components/RentalInfo";
+import About from "./About";
 import products from "../data/products";
 
 /*
@@ -19,6 +20,10 @@ function Home() {
     <>
       <section id="hero">
         <Hero />
+      </section>
+
+      <section id="our-story">
+        <About id="our-story" />
       </section>
 
       <section id="categories">

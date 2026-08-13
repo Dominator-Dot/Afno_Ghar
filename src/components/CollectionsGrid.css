@@ -6,7 +6,7 @@
 
 .collection-card {
   position: relative;
-  height: 220px;
+  aspect-ratio: 1 / 1;
   border-radius: var(--radius);
   background-size: cover;
   background-position: center;
@@ -28,9 +28,49 @@
   padding: 20px;
 }
 
+.collection-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(11, 61, 58, 0.85),
+    rgba(11, 61, 58, 0)
+  );
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 20px;
+  transition: background 0.3s ease;
+}
+
+.collection-card-meta {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--color-teal-900);
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 8px 10px;
+  border-radius: 999px;
+}
+
+.collection-card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
 .collection-overlay h3 {
   color: #fff;
   font-size: 1.3rem;
+}
+
+.collection-overlay p {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.9rem;
+  max-width: 220px;
+  margin-bottom: 8px;
 }
 
 .collection-overlay span {
@@ -38,6 +78,14 @@
   font-size: 0.85rem;
   font-weight: 600;
   margin-top: 4px;
+}
+
+.collection-card:hover .collection-overlay {
+  background: linear-gradient(
+    to top,
+    rgba(11, 61, 58, 0.92),
+    rgba(11, 61, 58, 0.1)
+  );
 }
 
 @media (max-width: 900px) {

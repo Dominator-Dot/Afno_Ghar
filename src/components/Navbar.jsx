@@ -1,17 +1,9 @@
-import { NavLink, useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
 import "./Navbar.css";
 
-/*
-  NavLink (from react-router-dom) works like a normal <a> tag,
-  but it automatically knows which page is currently active,
-  so we can highlight it (see the "active" class in Navbar.css).
-  
-  On the home page, we use IntersectionObserver to track which
-  section is currently in view and highlight it in the navbar.
-*/
 function Navbar() {
   const { totalItemsInCart } = useCart();
   const { user, logout } = useAuth();
@@ -19,13 +11,20 @@ function Navbar() {
   const location = useLocation();
   const [activeSection, setActiveSection] = useState("hero");
 
-  // Track which section is in view using IntersectionObserver
+  const navSections = [
+    { id: "hero", label: "Home" },
+    { id: "our-story", label: "Our Story" },
+    { id: "collections", label: "Collections" },
+    { id: "featured-products", label: "Products" },
+    { id: "testimonials", label: "Reviews" },
+  ];
+
   useEffect(() => {
-    if (location.pathname !== "/") return; // Only on home page
+    if (location.pathname !== "/") return;
 
     const options = {
       root: null,
-      rootMargin: "-50% 0px -50% 0px", // Highlight when section is in middle of viewport
+      rootMargin: "-50% 0px -50% 0px",
       threshold: 0,
     };
 
@@ -38,10 +37,8 @@ function Navbar() {
     };
 
     const observer = new IntersectionObserver(callback, options);
-
-    // Observe all home page sections
     const sections = document.querySelectorAll(
-      "#hero, #categories, #features, #collections, #featured-products, #testimonials"
+      "#hero, #our-story, #features, #collections, #featured-products, #testimonials"
     );
     sections.forEach((section) => observer.observe(section));
 
@@ -50,16 +47,36 @@ function Navbar() {
     };
   }, [location.pathname]);
 
+  useEffect(() => {
+    if (location.pathname !== "/" || !location.hash) return;
+
+    const sectionId = location.hash.replace("#", "");
+    const element = document.getElementById(sectionId);
+
+    if (element) {
+      setTimeout(() => {
+        element.scrollIntoView({ behavior: "smooth" });
+      }, 0);
+    }
+  }, [location.pathname, location.hash]);
+
   function handleLogout() {
     logout();
     navigate("/");
   }
 
-  // Smooth scroll to a section on home page
   function scrollToSection(sectionId) {
     const element = document.getElementById(sectionId);
     if (element) {
       element.scrollIntoView({ behavior: "smooth" });
+    }
+  }
+
+  function handleNavClick(sectionId) {
+    if (location.pathname === "/") {
+      scrollToSection(sectionId);
+    } else {
+      navigate({ pathname: "/", hash: `#${sectionId}` });
     }
   }
 
@@ -68,76 +85,34 @@ function Navbar() {
   return (
     <header className="navbar">
       <div className="container navbar-inner">
-        {/* Logo */}
-        <NavLink to="/" className="logo">
+        <button className="logo" type="button" onClick={() => navigate("/")}>
           <span className="logo-star">✦</span> Afno<span className="logo-accent">Ghar</span>
-        </NavLink>
+        </button>
 
-        {/* Main navigation links */}
         <nav className="nav-links">
-          {location.pathname === "/" ? (
-            <>
-              {/* On home page: scroll to sections */}
-              <button
-                className={`nav-link nav-scroll-btn ${
-                  activeSection === "hero" ? "active" : ""
-                }`}
-                onClick={() => scrollToSection("hero")}
-              >
-                Home
-              </button>
-              <button
-                className={`nav-link nav-scroll-btn ${
-                  activeSection === "categories" || activeSection === "collections"
-                    ? "active"
-                    : ""
-                }`}
-                onClick={() => scrollToSection("collections")}
-              >
-                Collections
-              </button>
-              <button
-                className={`nav-link nav-scroll-btn ${
-                  activeSection === "featured-products" ? "active" : ""
-                }`}
-                onClick={() => scrollToSection("featured-products")}
-              >
-                Products
-              </button>
-              <button
-                className={`nav-link nav-scroll-btn ${
-                  activeSection === "testimonials" ? "active" : ""
-                }`}
-                onClick={() => scrollToSection("testimonials")}
-              >
-                Reviews
-              </button>
-            </>
-          ) : (
-            <>
-              {/* On other pages: regular NavLinks */}
-              <NavLink to="/" className="nav-link" end>
-                Home
-              </NavLink>
-              <NavLink to="/products" className="nav-link">
-                Products
-              </NavLink>
-              <NavLink to="/about" className="nav-link">
-                About
-              </NavLink>
-              <NavLink to="/contact" className="nav-link">
-                Contact
-              </NavLink>
-            </>
-          )}
+          {navSections.map((section) => (
+            <button
+              key={section.id}
+              type="button"
+              className={`nav-link nav-scroll-btn ${
+                location.pathname === "/" && activeSection === section.id ? "active" : ""
+              }`}
+              onClick={() => handleNavClick(section.id)}
+            >
+              {section.label}
+            </button>
+          ))}
           {showSignInLink && (
-            <NavLink to="/signin" className="nav-link">
+            <button
+              type="button"
+              className="nav-link"
+              onClick={() => navigate("/signin")}
+            >
               Sign In
-            </NavLink>
+            </button>
           )}
         </nav>
 
-        {/* Cart icon with a small badge showing item count */}
         <div className="navbar-actions">
           {user && (
             <span className="navbar-greeting">
@@ -147,10 +122,10 @@ function Navbar() {
               </button>
             </span>
           )}
-          <NavLink to="/cart" className="cart-icon">
+          <button type="button" className="cart-icon" onClick={() => navigate("/cart")}>
             🛍
             <span className="cart-badge">{totalItemsInCart}</span>
-          </NavLink>
+          </button>
         </div>
       </div>
     </header>
