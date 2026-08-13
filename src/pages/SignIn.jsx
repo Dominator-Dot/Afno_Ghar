@@ -3,8 +3,6 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import "./SignIn.css";
 
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
 function SignIn() {
   const [mode, setMode] = useState("login"); // "login" | "signup"
   const [form, setForm] = useState({

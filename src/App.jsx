@@ -10,6 +10,9 @@ import Cart from "./pages/Cart";
 import ProductDetail from "./pages/ProductDetail";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
+import AdminDashboard from "./pages/AdminDashboard";
+import SellerDashboard from "./pages/SellerDashboard";
+import ProductsPage from "./pages/ProductsPage";
 
 /*
   App.jsx is the "shell" of the whole website.
@@ -34,12 +37,12 @@ function App() {
             path="/products"
             element={
               <ProtectedRoute>
-                <Products />
+                <ProductsPage />
               </ProtectedRoute>
             }
           />
           <Route
-            path="/products/:id"
+            path="/product/:id"
             element={
               <ProtectedRoute>
                 <ProductDetail />
@@ -54,6 +57,22 @@ function App() {
             element={
               <ProtectedRoute>
                 <Cart />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/dashboard"
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <AdminDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/seller/dashboard"
+            element={
+              <ProtectedRoute requiredRole="seller">
+                <SellerDashboard />
               </ProtectedRoute>
             }
           />
